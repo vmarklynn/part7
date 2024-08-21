@@ -8,7 +8,7 @@ const Blog = ({ blog, isCreator, onLike, onDelete }) => {
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5
+    marginBottom: 5,
   }
 
   const toggleVisibility = () => {
@@ -30,15 +30,25 @@ const Blog = ({ blog, isCreator, onLike, onDelete }) => {
 
   return (
     <div style={blogStyle}>
-      <p>{blog.title} - {blog.author} <button data-testid="toggle" onClick={toggleVisibility}>{visible ? 'Hide' : 'View'}</button></p>
-      {visible &&
-        <div data-testid='hidden'>
+      <p>
+        {blog.title} - {blog.author}{' '}
+        <button data-testid="toggle" onClick={toggleVisibility}>
+          {visible ? 'Hide' : 'View'}
+        </button>
+      </p>
+      {visible && (
+        <div data-testid="hidden">
           <p>{blog.url}</p>
-          <p>{blog.likes} <button data-testid="like" onClick={handleLike}>Like</button></p>
+          <p data-testid="likes">
+            {blog.likes}{' '}
+            <button data-testid="like" onClick={handleLike}>
+              Like
+            </button>
+          </p>
           <p>{blog.user ? blog.user.name : ''}</p>
           {isCreator && <button onClick={handleDelete}>Remove</button>}
         </div>
-      }
+      )}
     </div>
   )
 }

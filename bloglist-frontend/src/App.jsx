@@ -19,9 +19,9 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    blogService
+      .getAll()
+      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
   }, [])
 
   useEffect(() => {
@@ -60,7 +60,10 @@ const App = () => {
       const userInfo = blogToUpdate.user
       const updatedBlog = await blogService.updateBlog(blogToUpdate)
       updatedBlog.user = userInfo
-      const updatedBlogs = blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog)
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === updatedBlog.id ? updatedBlog : blog,
+      )
+      updatedBlogs.sort((a, b) => b.likes - a.likes)
       setBlogs(updatedBlogs)
     } catch (e) {
       setErrorMessage('Failed to Update')
@@ -77,10 +80,12 @@ const App = () => {
       createdBlog.user = {
         id: user.id,
         name: user.name,
-        username: user.username
+        username: user.username,
       }
       setBlogs(blogs.concat(createdBlog))
-      setMessage(`A new blog ${createdBlog.title} by ${createdBlog.author} has been added`)
+      setMessage(
+        `A new blog ${createdBlog.title} by ${createdBlog.author} has been added`,
+      )
       setTimeout(() => {
         setMessage(null)
       }, 5000)
@@ -95,9 +100,8 @@ const App = () => {
   const handleDelete = async (blogId) => {
     try {
       await blogService.deleteBlog(blogId)
-      const newBlogs = blogs.filter(blog => blog.id !== blogId)
+      const newBlogs = blogs.filter((blog) => blog.id !== blogId)
       setBlogs(newBlogs)
-
     } catch (e) {
       setErrorMessage('Failed to delete')
       setTimeout(() => {
@@ -108,10 +112,13 @@ const App = () => {
 
   return (
     <div>
-      <Alert show={(error || message) ? true : false} text={error ? error : message} error={error ? true : false} />
+      <Alert
+        show={error || message ? true : false}
+        text={error ? error : message}
+        error={error ? true : false}
+      />
       <h2>{user ? 'Blogs' : 'Log In to Application'}</h2>
-      {
-        !user &&
+      {!user && (
         <Login
           username={username}
           password={password}
@@ -119,33 +126,33 @@ const App = () => {
           setPassword={setPassword}
           onSubmit={handleLogin}
         />
-      }
+      )}
 
-      {user &&
+      {user && (
         <div>
-          <p>{user.name} is currently logged in
+          <p>
+            {user.name} is currently logged in
             {user && <button onClick={handleLogout}>Log out</button>}
           </p>
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} isCreator={user.username === blog.user.username} onLike={handleLike} onDelete={handleDelete} />)}
+          {blogs.map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              isCreator={user.username === blog.user.username}
+              onLike={handleLike}
+              onDelete={handleDelete}
+            />
+          ))}
         </div>
-      }
+      )}
 
-      {user &&
+      {user && (
         <Togglable buttonLabel="New Note" ref={blogFormRef}>
-          <BlogForm
-            create={createBlog}
-          />
+          <BlogForm create={createBlog} />
         </Togglable>
-      }
+      )}
     </div>
   )
 }
 
 export default App
-
-
-
-
-
-

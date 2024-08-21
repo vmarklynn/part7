@@ -6,19 +6,21 @@ const Login = ({ username, password, setPassword, setUsername, onSubmit }) => {
       <form onSubmit={onSubmit}>
         <label>Username</label>
         <input
-          type='text'
+          type="text"
           value={username}
-          name='Username'
+          name="Username"
           onChange={(event) => setUsername(event.target.value)}
+          data-testid="username"
         />
         <label>Password</label>
         <input
-          type='password'
+          type="password"
           value={password}
-          name='Password'
+          name="Password"
           onChange={(event) => setPassword(event.target.value)}
+          data-testid="password"
         />
-        <button type='submit'>Login</button>
+        <button type="submit">Login</button>
       </form>
     </div>
   )

@@ -8,14 +8,10 @@ test('renders content', () => {
     author: 'test',
     title: 'test',
     url: 'www.test.com',
-    likes: 0
+    likes: 0,
   }
 
-  render(<Blog isCreator={true}
-    blog={blog}
-    onLike={vi.fn}
-    onDelete={vi.fn}
-  />)
+  render(<Blog isCreator={true} blog={blog} onLike={vi.fn} onDelete={vi.fn} />)
 
   const element = screen.getByText('test - test')
   const hidden = screen.queryByTestId('hidden')
@@ -28,15 +24,10 @@ test('hidden components are shown', async () => {
     author: 'test',
     title: 'test',
     url: 'www.test.com',
-    likes: 0
+    likes: 0,
   }
 
-
-  render(<Blog isCreator={true}
-    blog={blog}
-    onLike={vi.fn}
-    onDelete={vi.fn}
-  />)
+  render(<Blog isCreator={true} blog={blog} onLike={vi.fn} onDelete={vi.fn} />)
 
   const user = userEvent.setup()
   const button = screen.getByTestId('toggle')
@@ -51,11 +42,18 @@ test('event handlers are called properly', async () => {
     author: 'test',
     title: 'test',
     url: 'www.test.com',
-    likes: 0
+    likes: 0,
   }
 
   const mockLikeHandler = vi.fn()
-  render(<Blog isCreator={true} blog={blog} onLike={mockLikeHandler} onDelete={vi.fn} />)
+  render(
+    <Blog
+      isCreator={true}
+      blog={blog}
+      onLike={mockLikeHandler}
+      onDelete={vi.fn}
+    />,
+  )
 
   const user = userEvent.setup()
 
