@@ -8,7 +8,7 @@ test('renders content', () => {
     author: 'test',
     title: 'test',
     url: 'www.test.com',
-    likes: 0,
+    likes: 0
   }
 
   render(<Blog isCreator={true} blog={blog} onLike={vi.fn} onDelete={vi.fn} />)
@@ -24,7 +24,7 @@ test('hidden components are shown', async () => {
     author: 'test',
     title: 'test',
     url: 'www.test.com',
-    likes: 0,
+    likes: 0
   }
 
   render(<Blog isCreator={true} blog={blog} onLike={vi.fn} onDelete={vi.fn} />)
@@ -42,7 +42,7 @@ test('event handlers are called properly', async () => {
     author: 'test',
     title: 'test',
     url: 'www.test.com',
-    likes: 0,
+    likes: 0
   }
 
   const mockLikeHandler = vi.fn()
@@ -52,7 +52,7 @@ test('event handlers are called properly', async () => {
       blog={blog}
       onLike={mockLikeHandler}
       onDelete={vi.fn}
-    />,
+    />
   )
 
   const user = userEvent.setup()

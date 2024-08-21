@@ -11,7 +11,7 @@ const BlogForm = ({ create }) => {
     const blog = {
       author: author,
       title: title,
-      url: url,
+      url: url
     }
     create(blog)
     setTitle('')
@@ -53,7 +53,7 @@ const BlogForm = ({ create }) => {
 }
 
 BlogForm.propTypes = {
-  create: PropTypes.func.isRequired,
+  create: PropTypes.func.isRequired
 }
 
 export default BlogForm

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
+import { handleAlert } from './reducers/alertReducer'
 import './index.css'
 import Blog from './components/Blog/Blog'
 import BlogForm from './components/BlogForm/BlogForm'
@@ -9,6 +11,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
+  const dispatch = useDispatch()
   const [blogs, setBlogs] = useState([])
   const [error, setErrorMessage] = useState(null)
   const [message, setMessage] = useState(null)
@@ -61,7 +64,7 @@ const App = () => {
       const updatedBlog = await blogService.updateBlog(blogToUpdate)
       updatedBlog.user = userInfo
       const updatedBlogs = blogs.map((blog) =>
-        blog.id === updatedBlog.id ? updatedBlog : blog,
+        blog.id === updatedBlog.id ? updatedBlog : blog
       )
       updatedBlogs.sort((a, b) => b.likes - a.likes)
       setBlogs(updatedBlogs)
@@ -80,15 +83,16 @@ const App = () => {
       createdBlog.user = {
         id: user.id,
         name: user.name,
-        username: user.username,
+        username: user.username
       }
       setBlogs(blogs.concat(createdBlog))
-      setMessage(
-        `A new blog ${createdBlog.title} by ${createdBlog.author} has been added`,
+
+      dispatch(
+        handleAlert(
+          `A new blog ${createdBlog.title} by ${createdBlog.author} was added.`,
+          false
+        )
       )
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
     } catch (e) {
       setErrorMessage('Failed to post blog')
       setTimeout(() => {
@@ -112,11 +116,7 @@ const App = () => {
 
   return (
     <div>
-      <Alert
-        show={error || message ? true : false}
-        text={error ? error : message}
-        error={error ? true : false}
-      />
+      <Alert />
       <h2>{user ? 'Blogs' : 'Log In to Application'}</h2>
       {!user && (
         <Login

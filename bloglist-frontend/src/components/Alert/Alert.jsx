@@ -1,6 +1,14 @@
-const Alert = ({ show, text, error }) => {
+import { useSelector } from 'react-redux'
+
+const Alert = () => {
+  const alert = useSelector((state) => state.alert)
+
   return (
-    <div>{show && <h2 className={error ? 'error' : 'success'}>{text}</h2>}</div>
+    <div>
+      {alert.alert.length > 0 && (
+        <h2 className={alert.error ? 'error' : 'success'}>{alert.alert}</h2>
+      )}
+    </div>
   )
 }
 
