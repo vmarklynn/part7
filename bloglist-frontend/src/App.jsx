@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { handleAlert } from './reducers/alertReducer'
+import { initializeBlogs } from './reducers/blogReducer'
 import './index.css'
 import Blog from './components/Blog/Blog'
 import BlogForm from './components/BlogForm/BlogForm'
@@ -12,6 +13,7 @@ import loginService from './services/login'
 
 const App = () => {
   const dispatch = useDispatch()
+  const reduxBlogs = useSelector((state) => state.blog)
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -20,10 +22,10 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService
-      .getAll()
-      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
-  }, [])
+    dispatch(initializeBlogs())
+  }, [dispatch])
+
+  console.log('Currently contains: ', reduxBlogs)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
@@ -120,7 +122,7 @@ const App = () => {
             {user.name} is currently logged in
             {user && <button onClick={handleLogout}>Log out</button>}
           </p>
-          {blogs.map((blog) => (
+          {reduxBlogs.map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
