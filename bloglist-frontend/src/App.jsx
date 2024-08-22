@@ -13,8 +13,6 @@ import loginService from './services/login'
 const App = () => {
   const dispatch = useDispatch()
   const [blogs, setBlogs] = useState([])
-  const [error, setErrorMessage] = useState(null)
-  const [message, setMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -46,10 +44,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (e) {
-      setErrorMessage('Wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      dispatch(handleAlert('Wrong credentials', true))
     }
   }
 
@@ -69,10 +64,7 @@ const App = () => {
       updatedBlogs.sort((a, b) => b.likes - a.likes)
       setBlogs(updatedBlogs)
     } catch (e) {
-      setErrorMessage('Failed to Update')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      dispatch(handleAlert('Failed to update', true))
     }
   }
 
@@ -94,10 +86,7 @@ const App = () => {
         )
       )
     } catch (e) {
-      setErrorMessage('Failed to post blog')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      dispatch(handleAlert('Failed to post blog', true))
     }
   }
 
@@ -107,10 +96,7 @@ const App = () => {
       const newBlogs = blogs.filter((blog) => blog.id !== blogId)
       setBlogs(newBlogs)
     } catch (e) {
-      setErrorMessage('Failed to delete')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      dispatch(handleAlert('Failed to delete', true))
     }
   }
 
