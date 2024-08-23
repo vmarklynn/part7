@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleAlert } from './reducers/alertReducer'
-import { initializeBlogs } from './reducers/blogReducer'
+import {
+  initializeBlogs,
+  createBlog,
+  setAllBlogs
+} from './reducers/blogReducer'
 import './index.css'
 import Blog from './components/Blog/Blog'
 import BlogForm from './components/BlogForm/BlogForm'
@@ -25,8 +29,6 @@ const App = () => {
     dispatch(initializeBlogs())
   }, [dispatch])
 
-  console.log('Currently contains: ', reduxBlogs)
-
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
     if (loggedUserJSON) {
@@ -35,6 +37,8 @@ const App = () => {
       setUser(user)
     }
   }, [])
+
+  console.log(reduxBlogs)
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -57,33 +61,28 @@ const App = () => {
 
   const handleLike = async (blogToUpdate) => {
     try {
-      const userInfo = blogToUpdate.user
       const updatedBlog = await blogService.updateBlog(blogToUpdate)
-      updatedBlog.user = userInfo
-      const updatedBlogs = blogs.map((blog) =>
+      const updatedBlogs = reduxBlogs.map((blog) =>
         blog.id === updatedBlog.id ? updatedBlog : blog
       )
       updatedBlogs.sort((a, b) => b.likes - a.likes)
-      setBlogs(updatedBlogs)
+      dispatch(setAllBlogs(updatedBlogs))
     } catch (e) {
       dispatch(handleAlert('Failed to update', true))
     }
   }
 
-  const createBlog = async (blogObject) => {
+  const create = (blogObject) => {
     try {
+      console.log(user)
       blogFormRef.current.toggleVisibility()
-      const createdBlog = await blogService.createBlog(blogObject)
-      createdBlog.user = {
-        id: user.id,
-        name: user.name,
-        username: user.username
-      }
-      setBlogs(blogs.concat(createdBlog))
+      console.log(blogObject)
+
+      dispatch(createBlog(blogObject))
 
       dispatch(
         handleAlert(
-          `A new blog ${createdBlog.title} by ${createdBlog.author} was added.`,
+          `A new blog ${blogObject.title} by ${blogObject.author} was added.`,
           false
         )
       )
@@ -136,7 +135,7 @@ const App = () => {
 
       {user && (
         <Togglable buttonLabel="New Note" ref={blogFormRef}>
-          <BlogForm create={createBlog} />
+          <BlogForm create={create} />
         </Togglable>
       )}
     </div>
