@@ -5,7 +5,8 @@ import {
   initializeBlogs,
   createBlog,
   setAllBlogs,
-  updateBlog
+  updateBlog,
+  deleteBlog
 } from './reducers/blogReducer'
 import './index.css'
 import Blog from './components/Blog/Blog'
@@ -19,7 +20,6 @@ import loginService from './services/login'
 const App = () => {
   const dispatch = useDispatch()
   const reduxBlogs = useSelector((state) => state.blog)
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -85,9 +85,7 @@ const App = () => {
 
   const handleDelete = async (blogId) => {
     try {
-      await blogService.deleteBlog(blogId)
-      const newBlogs = blogs.filter((blog) => blog.id !== blogId)
-      setBlogs(newBlogs)
+      dispatch(deleteBlog(blogId))
     } catch (e) {
       dispatch(handleAlert('Failed to delete', true))
     }
