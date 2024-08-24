@@ -4,7 +4,6 @@ import { handleAlert } from './reducers/alertReducer'
 import {
   initializeBlogs,
   createBlog,
-  setAllBlogs,
   updateBlog,
   deleteBlog
 } from './reducers/blogReducer'
@@ -14,15 +13,14 @@ import BlogForm from './components/BlogForm/BlogForm'
 import Login from './components/Login/Login'
 import Togglable from './components/Togglable/Togglable'
 import Alert from './components/Alert/Alert'
-import blogService from './services/blogs'
-import loginService from './services/login'
+import { getExistingUser, login, logout } from './reducers/userReducer'
 
 const App = () => {
   const dispatch = useDispatch()
   const reduxBlogs = useSelector((state) => state.blog)
+  const user = useSelector((state) => state.user)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
 
@@ -31,23 +29,15 @@ const App = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      blogService.setToken(user.token)
-      setUser(user)
-    }
-  }, [])
+    dispatch(getExistingUser())
+  }, [dispatch])
 
   console.log(reduxBlogs)
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
+      dispatch(login(username, password))
       setUsername('')
       setPassword('')
     } catch (e) {
@@ -56,8 +46,7 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogUser')
-    setUser(null)
+    dispatch(logout())
   }
 
   const handleLike = async (blogToUpdate) => {
