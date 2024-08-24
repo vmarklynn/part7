@@ -4,7 +4,8 @@ import { handleAlert } from './reducers/alertReducer'
 import {
   initializeBlogs,
   createBlog,
-  setAllBlogs
+  setAllBlogs,
+  updateBlog
 } from './reducers/blogReducer'
 import './index.css'
 import Blog from './components/Blog/Blog'
@@ -61,12 +62,7 @@ const App = () => {
 
   const handleLike = async (blogToUpdate) => {
     try {
-      const updatedBlog = await blogService.updateBlog(blogToUpdate)
-      const updatedBlogs = reduxBlogs.map((blog) =>
-        blog.id === updatedBlog.id ? updatedBlog : blog
-      )
-      updatedBlogs.sort((a, b) => b.likes - a.likes)
-      dispatch(setAllBlogs(updatedBlogs))
+      dispatch(updateBlog(blogToUpdate))
     } catch (e) {
       dispatch(handleAlert('Failed to update', true))
     }
@@ -74,12 +70,8 @@ const App = () => {
 
   const create = (blogObject) => {
     try {
-      console.log(user)
       blogFormRef.current.toggleVisibility()
-      console.log(blogObject)
-
       dispatch(createBlog(blogObject))
-
       dispatch(
         handleAlert(
           `A new blog ${blogObject.title} by ${blogObject.author} was added.`,
@@ -121,15 +113,17 @@ const App = () => {
             {user.name} is currently logged in
             {user && <button onClick={handleLogout}>Log out</button>}
           </p>
-          {reduxBlogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              isCreator={user.username === blog.user.username}
-              onLike={handleLike}
-              onDelete={handleDelete}
-            />
-          ))}
+          {[...reduxBlogs]
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                isCreator={user.username === blog.user.username}
+                onLike={handleLike}
+                onDelete={handleDelete}
+              />
+            ))}
         </div>
       )}
 
