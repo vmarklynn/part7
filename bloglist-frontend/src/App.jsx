@@ -4,12 +4,7 @@ import blogService from './services/blogs'
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleAlert } from './reducers/alertReducer'
-import {
-  initializeBlogs,
-  createBlog,
-  updateBlog,
-  deleteBlog
-} from './reducers/blogReducer'
+import { initializeBlogs, createBlog } from './reducers/blogReducer'
 import Users from './components/Users/Users'
 import {
   Routes,
@@ -48,18 +43,17 @@ const UserHeader = ({ user }) => {
   )
 }
 
-const Blogs = ({ user }) => {
-  const dispatch = useDispatch()
-  const reduxBlogs = useSelector((state) => state.blog)
-  const blogFormRef = useRef()
-
-  const handleLike = async (blogToUpdate) => {
-    try {
-      dispatch(updateBlog(blogToUpdate))
-    } catch (e) {
-      dispatch(handleAlert('Failed to update', true))
-    }
+const Blogs = ({ blogs }) => {
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
   }
+
+  const dispatch = useDispatch()
+  const blogFormRef = useRef()
 
   const create = (blogObject) => {
     try {
@@ -76,27 +70,17 @@ const Blogs = ({ user }) => {
     }
   }
 
-  const handleDelete = async (blogId) => {
-    try {
-      dispatch(deleteBlog(blogId))
-    } catch (e) {
-      dispatch(handleAlert('Failed to delete', true))
-    }
-  }
-
   return (
     <div>
       <div>
-        {[...reduxBlogs]
+        {[...blogs]
           .sort((a, b) => b.likes - a.likes)
           .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              isCreator={user.username === blog.user.username}
-              onLike={handleLike}
-              onDelete={handleDelete}
-            />
+            <div key={blog.id} style={blogStyle}>
+              <Link to={`/blogs/${blog.id}`}>
+                {blog.title}-{blog.author}
+              </Link>
+            </div>
           ))}
       </div>
       <Togglable buttonLabel="New Note" ref={blogFormRef}>
@@ -121,10 +105,8 @@ const LoginPage = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
-      console.log('Navigating!')
-      navigate('/')
+      navigate('/blogs')
     } catch (e) {
-      console.log(e)
       dispatch(handleAlert('Wrong credentials', true))
     }
   }
@@ -142,8 +124,13 @@ const LoginPage = () => {
 const App = () => {
   const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
+  const blogs = useSelector((state) => state.blog)
   const [users, setUsers] = useState(null)
+
   const match = useMatch('/users/:id')
+  const blogMatch = useMatch('/blogs/:id')
+
+  console.log('Users information: ', users)
 
   useEffect(() => {
     userService
@@ -152,35 +139,47 @@ const App = () => {
         setUsers(users)
       })
       .catch((error) => console.log(error))
-  }, [])
+  }, [blogs])
 
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch])
 
+  if (!blogs) return null
   if (!users) return null
+
   const matchedUser = match
     ? users.find((user) => user.id === match.params.id)
+    : null
+
+  const matchedBlog = blogMatch
+    ? blogs.find((blog) => blog.id === blogMatch.params.id)
     : null
 
   return (
     <div>
       <Link to="/users">Users</Link>
-      <Link to="/">Blogs</Link>
+      <Link to="/blogs">Blogs</Link>
       <p>{user && user.name}</p>
       <h2>{user ? 'Blogs' : 'Log In to Application'}</h2>
       <Alert />
       <UserHeader user={user} logoutFunction={setUser} />
       <Routes>
         <Route
-          path="/"
+          path="/blogs"
           element={
-            user ? <Blogs user={user} /> : <Navigate replace to="/login" />
+            user ? <Blogs blogs={blogs} /> : <Navigate replace to="/login" />
           }
         />
         <Route
+          path="/blogs/:id"
+          element={<Blog user={user} blog={matchedBlog} />}
+        />
+        <Route
           path="/users"
-          element={user ? <Users /> : <Navigate replace to="/login" />}
+          element={
+            user ? <Users users={users} /> : <Navigate replace to="/login" />
+          }
         />
         <Route path="/users/:id" element={<User user={matchedUser} />} />
         <Route path="/login" element={<LoginPage />} />

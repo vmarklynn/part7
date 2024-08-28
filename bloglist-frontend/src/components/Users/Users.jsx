@@ -1,19 +1,6 @@
-import userService from '../../services/users'
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-const Users = () => {
-  const [users, setUsers] = useState(null)
-
-  useEffect(() => {
-    userService
-      .getAll()
-      .then((users) => {
-        setUsers(users)
-      })
-      .catch((error) => console.log(error))
-  }, [])
-
+const Users = ({ users }) => {
   if (!users) return null
 
   return (

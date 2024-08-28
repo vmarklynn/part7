@@ -1,7 +1,9 @@
+import { useState } from 'react'
+
 const User = ({ user }) => {
   if (!user) return null
 
-  const blogs = user.blogs
+  const [blogs, setBlogs] = useState(user.blogs)
 
   return (
     <div>

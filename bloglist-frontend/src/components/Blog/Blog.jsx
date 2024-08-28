@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { updateBlog, deleteBlog } from '../../reducers/blogReducer'
+import { handleAlert } from '../../reducers/alertReducer'
 
-const Blog = ({ blog, isCreator, onLike, onDelete }) => {
-  const [visible, setVisible] = useState(false)
+const Blog = ({ blog, user }) => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const blogStyle = {
     paddingTop: 10,
@@ -11,20 +15,25 @@ const Blog = ({ blog, isCreator, onLike, onDelete }) => {
     marginBottom: 5
   }
 
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
-
   const handleLike = () => {
-    const newLike = blog.likes + 1
-    const updatedBlog = { ...blog, likes: newLike }
-    onLike(updatedBlog)
+    try {
+      const newLike = blog.likes + 1
+      const updatedBlog = { ...blog, likes: newLike }
+      dispatch(updateBlog(updatedBlog))
+    } catch (e) {
+      dispatch(handleAlert('Failed to update', true))
+    }
   }
 
   const handleDelete = () => {
-    if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
-      const id = blog.id
-      onDelete(id)
+    try {
+      if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
+        const id = blog.id
+        dispatch(deleteBlog(id))
+        navigate('/blogs')
+      }
+    } catch (e) {
+      dispatch(handleAlert('Failed to delete', true))
     }
   }
 
@@ -32,11 +41,8 @@ const Blog = ({ blog, isCreator, onLike, onDelete }) => {
     <div style={blogStyle}>
       <p>
         {blog.title} - {blog.author}{' '}
-        <button data-testid="toggle" onClick={toggleVisibility}>
-          {visible ? 'Hide' : 'View'}
-        </button>
       </p>
-      {visible && (
+      {
         <div data-testid="hidden">
           <p>{blog.url}</p>
           <p data-testid="likes">
@@ -46,9 +52,11 @@ const Blog = ({ blog, isCreator, onLike, onDelete }) => {
             </button>
           </p>
           <p>{blog.user ? blog.user.name : ''}</p>
-          {isCreator && <button onClick={handleDelete}>Remove</button>}
+          {blog.user.username === user.username && (
+            <button onClick={handleDelete}>Remove</button>
+          )}
         </div>
-      )}
+      }
     </div>
   )
 }
