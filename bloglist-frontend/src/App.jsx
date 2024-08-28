@@ -1,4 +1,5 @@
 import loginService from './services/login'
+import userService from './services/users'
 import blogService from './services/blogs'
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,7 +11,14 @@ import {
   deleteBlog
 } from './reducers/blogReducer'
 import Users from './components/Users/Users'
-import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom'
+import {
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+  Link,
+  useMatch
+} from 'react-router-dom'
 import './index.css'
 import Blog from './components/Blog/Blog'
 import BlogForm from './components/BlogForm/BlogForm'
@@ -18,6 +26,7 @@ import Login from './components/Login/Login'
 import Togglable from './components/Togglable/Togglable'
 import Alert from './components/Alert/Alert'
 import { setUser } from './reducers/userReducer'
+import User from './components/Users/User'
 
 const UserHeader = ({ user }) => {
   const navigate = useNavigate()
@@ -73,10 +82,6 @@ const Blogs = ({ user }) => {
     } catch (e) {
       dispatch(handleAlert('Failed to delete', true))
     }
-  }
-
-  if (!user) {
-    return <div>Loading...</div>
   }
 
   return (
@@ -137,12 +142,26 @@ const LoginPage = () => {
 const App = () => {
   const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
+  const [users, setUsers] = useState(null)
+  const match = useMatch('/users/:id')
 
-  console.log('Current user: ', user)
+  useEffect(() => {
+    userService
+      .getAll()
+      .then((users) => {
+        setUsers(users)
+      })
+      .catch((error) => console.log(error))
+  }, [])
 
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch])
+
+  if (!users) return null
+  const matchedUser = match
+    ? users.find((user) => user.id === match.params.id)
+    : null
 
   return (
     <div>
@@ -163,6 +182,7 @@ const App = () => {
           path="/users"
           element={user ? <Users /> : <Navigate replace to="/login" />}
         />
+        <Route path="/users/:id" element={<User user={matchedUser} />} />
         <Route path="/login" element={<LoginPage />} />
       </Routes>
     </div>
