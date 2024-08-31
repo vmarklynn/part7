@@ -11,6 +11,8 @@ blogsRouter.post("/", userExtractor, async (request, response) => {
   const body = request.body;
   const user = request.user;
 
+  console.log(user);
+
   const blog = new Blog({
     title: body.title,
     author: body.author,
@@ -20,9 +22,9 @@ blogsRouter.post("/", userExtractor, async (request, response) => {
   });
 
   const savedBlog = await blog.save();
+
   user.blogs = user.blogs.concat(savedBlog._id);
   await user.save();
-
   response.status(201).json(savedBlog);
 });
 
@@ -51,9 +53,28 @@ blogsRouter.put("/:id", async (request, response) => {
 
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, newBlog, {
     new: true,
-  });
+  }).populate("user", { username: 1, name: 1 });
 
   response.json(updatedBlog);
+});
+
+blogsRouter.get("/:id/comments", async (request, response) => {
+  const currentBlog = await Blog.findById(request.params.id);
+  const comments = currentBlog.comments;
+  console.log(comments);
+
+  response.json(comments);
+});
+
+blogsRouter.post("/:id/comments", async (request, response) => {
+  const body = request.body;
+
+  const currentBlog = await Blog.findById(request.params.id);
+  currentBlog.comments = currentBlog.comments.concat(body.comment);
+
+  await currentBlog.save();
+
+  response.status(201).json(currentBlog.comments);
 });
 
 module.exports = blogsRouter;
