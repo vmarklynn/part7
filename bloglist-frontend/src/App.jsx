@@ -1,3 +1,4 @@
+import { Container, AppBar, Toolbar, Button } from '@mui/material'
 import loginService from './services/login'
 import userService from './services/users'
 import blogService from './services/blogs'
@@ -23,9 +24,19 @@ import Alert from './components/Alert/Alert'
 import { setUser } from './reducers/userReducer'
 import User from './components/Users/User'
 
-const UserHeader = ({ user }) => {
+const Header = ({ user }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+
+  const container = {
+    display: 'flex',
+    backgroundColor: 'grey'
+  }
+
+  const linkStyle = {
+    padding: 5,
+    margin: 0
+  }
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogUser')
@@ -35,10 +46,26 @@ const UserHeader = ({ user }) => {
 
   return (
     user && (
-      <p>
-        {user.name} is currently logged in
-        {user && <button onClick={handleLogout}>Log out</button>}
-      </p>
+      <div>
+        <AppBar position="static">
+          <Toolbar>
+            <Button color="inherit" component={Link} to="/blogs">
+              Blogs
+            </Button>
+            <Button color="inherit" component={Link} to="/users">
+              Users
+            </Button>
+            <p style={linkStyle}>
+              {user.name} is currently logged in
+              {user && (
+                <Button color="inherit" onClick={handleLogout}>
+                  Log out
+                </Button>
+              )}
+            </p>
+          </Toolbar>
+        </AppBar>
+      </div>
     )
   )
 }
@@ -72,6 +99,7 @@ const Blogs = ({ blogs }) => {
 
   return (
     <div>
+      <h2>Blog</h2>
       <div>
         {[...blogs]
           .sort((a, b) => b.likes - a.likes)
@@ -130,8 +158,6 @@ const App = () => {
   const match = useMatch('/users/:id')
   const blogMatch = useMatch('/blogs/:id')
 
-  console.log('Users information: ', users)
-
   useEffect(() => {
     userService
       .getAll()
@@ -157,34 +183,32 @@ const App = () => {
     : null
 
   return (
-    <div>
-      <Link to="/users">Users</Link>
-      <Link to="/blogs">Blogs</Link>
-      <p>{user && user.name}</p>
-      <h2>{user ? 'Blogs' : 'Log In to Application'}</h2>
-      <Alert />
-      <UserHeader user={user} logoutFunction={setUser} />
-      <Routes>
-        <Route
-          path="/blogs"
-          element={
-            user ? <Blogs blogs={blogs} /> : <Navigate replace to="/login" />
-          }
-        />
-        <Route
-          path="/blogs/:id"
-          element={<Blog user={user} blog={matchedBlog} />}
-        />
-        <Route
-          path="/users"
-          element={
-            user ? <Users users={users} /> : <Navigate replace to="/login" />
-          }
-        />
-        <Route path="/users/:id" element={<User user={matchedUser} />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
-    </div>
+    <Container>
+      <div>
+        <Header user={user} />
+        <Alert />
+        <Routes>
+          <Route
+            path="/blogs"
+            element={
+              user ? <Blogs blogs={blogs} /> : <Navigate replace to="/login" />
+            }
+          />
+          <Route
+            path="/blogs/:id"
+            element={<Blog user={user} blog={matchedBlog} />}
+          />
+          <Route
+            path="/users"
+            element={
+              user ? <Users users={users} /> : <Navigate replace to="/login" />
+            }
+          />
+          <Route path="/users/:id" element={<User user={matchedUser} />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </div>
+    </Container>
   )
 }
 

@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import { Alert as MuiAlert } from '@mui/material'
 
 const Alert = () => {
   const alert = useSelector((state) => state.alert)
@@ -6,7 +7,9 @@ const Alert = () => {
   return (
     <div>
       {alert.alert.length > 0 && (
-        <h2 className={alert.error ? 'error' : 'success'}>{alert.alert}</h2>
+        <MuiAlert severity={alert.error ? 'error' : 'success'}>
+          {alert.alert}
+        </MuiAlert>
       )}
     </div>
   )
