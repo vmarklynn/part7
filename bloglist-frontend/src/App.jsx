@@ -10,7 +10,8 @@ import {
   TableCell,
   TablePagination,
   TableBody,
-  Paper
+  Paper,
+  Typography
 } from '@mui/material'
 import loginService from './services/login'
 import userService from './services/users'
@@ -79,9 +80,10 @@ const Header = ({ user }) => {
 }
 
 const Blogs = ({ blogs }) => {
+  const ROWS_PER_PAGE = 10
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
-  const [page, setPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE)
 
   const dispatch = useDispatch()
   const blogFormRef = useRef()
@@ -90,17 +92,8 @@ const Blogs = ({ blogs }) => {
     setPage(newPage)
   }
 
-  console.log(sortedBlogs)
-
-  const paginatedBlogs = sortedBlogs.slice(
-    (page - 1) * rowsPerPage,
-    rowsPerPage * page
-  )
-
-  console.log(paginatedBlogs)
-
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 5))
+    setRowsPerPage(parseInt(event.target.value, ROWS_PER_PAGE))
     setPage(0)
   }
 
@@ -123,8 +116,8 @@ const Blogs = ({ blogs }) => {
 
   return (
     <TableContainer component={Paper}>
-      <h2>Blog</h2>
-      <Table striped>
+      <h1>Blogs</h1>
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell>Title</TableCell>
@@ -132,14 +125,16 @@ const Blogs = ({ blogs }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedBlogs.map((blog) => (
-            <TableRow key={blog.id}>
-              <TableCell scope="blog">
-                <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-              </TableCell>
-              <TableCell>{blog.author}</TableCell>
-            </TableRow>
-          ))}
+          {sortedBlogs
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((blog) => (
+              <TableRow key={blog.id}>
+                <TableCell scope="blog">
+                  <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                </TableCell>
+                <TableCell>{blog.author}</TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
       <Togglable buttonLabel="New Note" ref={blogFormRef}>
@@ -147,7 +142,7 @@ const Blogs = ({ blogs }) => {
       </Togglable>
       <TablePagination
         component="div"
-        count={Math.ceil(blogs.length / rowsPerPage)}
+        count={blogs.length}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}

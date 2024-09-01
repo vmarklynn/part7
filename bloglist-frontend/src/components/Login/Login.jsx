@@ -5,7 +5,7 @@ const Login = ({ username, password, setPassword, setUsername, onSubmit }) => {
   return (
     <Box display="flex" justifyContent={'center'} alignItems={'center'}>
       <form onSubmit={onSubmit}>
-        <h2>Log In to Blog App</h2>
+        <h1>Log In to Blog App</h1>
         <div>
           <TextField
             margin="normal"
