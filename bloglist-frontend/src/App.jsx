@@ -1,4 +1,17 @@
-import { Container, AppBar, Toolbar, Button } from '@mui/material'
+import {
+  Container,
+  AppBar,
+  Toolbar,
+  Button,
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableCell,
+  TablePagination,
+  TableBody,
+  Paper
+} from '@mui/material'
 import loginService from './services/login'
 import userService from './services/users'
 import blogService from './services/blogs'
@@ -27,11 +40,6 @@ import User from './components/Users/User'
 const Header = ({ user }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-
-  const container = {
-    display: 'flex',
-    backgroundColor: 'grey'
-  }
 
   const linkStyle = {
     padding: 5,
@@ -71,16 +79,30 @@ const Header = ({ user }) => {
 }
 
 const Blogs = ({ blogs }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
+  const [page, setPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(5)
 
   const dispatch = useDispatch()
   const blogFormRef = useRef()
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage)
+  }
+
+  console.log(sortedBlogs)
+
+  const paginatedBlogs = sortedBlogs.slice(
+    (page - 1) * rowsPerPage,
+    rowsPerPage * page
+  )
+
+  console.log(paginatedBlogs)
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 5))
+    setPage(0)
+  }
 
   const create = (blogObject) => {
     try {
@@ -97,24 +119,41 @@ const Blogs = ({ blogs }) => {
     }
   }
 
+  if (!blogs) return null
+
   return (
-    <div>
+    <TableContainer component={Paper}>
       <h2>Blog</h2>
-      <div>
-        {[...blogs]
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <div key={blog.id} style={blogStyle}>
-              <Link to={`/blogs/${blog.id}`}>
-                {blog.title}-{blog.author}
-              </Link>
-            </div>
+      <Table striped>
+        <TableHead>
+          <TableRow>
+            <TableCell>Title</TableCell>
+            <TableCell>Author</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {paginatedBlogs.map((blog) => (
+            <TableRow key={blog.id}>
+              <TableCell scope="blog">
+                <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+              </TableCell>
+              <TableCell>{blog.author}</TableCell>
+            </TableRow>
           ))}
-      </div>
+        </TableBody>
+      </Table>
       <Togglable buttonLabel="New Note" ref={blogFormRef}>
         <BlogForm create={create} />
       </Togglable>
-    </div>
+      <TablePagination
+        component="div"
+        count={Math.ceil(blogs.length / rowsPerPage)}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </TableContainer>
   )
 }
 
