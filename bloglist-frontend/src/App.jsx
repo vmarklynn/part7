@@ -29,7 +29,6 @@ import {
   Link,
   useMatch
 } from 'react-router-dom'
-import './index.css'
 import Blog from './components/Blog/Blog'
 import BlogForm from './components/BlogForm/BlogForm'
 import Login from './components/Login/Login'

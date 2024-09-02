@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Box, Button, TextField } from '@mui/material'
 import PropTypes from 'prop-types'
 
 const BlogForm = ({ create }) => {
@@ -20,35 +21,38 @@ const BlogForm = ({ create }) => {
   }
 
   return (
-    <div>
+    <Box>
       <form onSubmit={handleSubmit}>
-        <label>Title</label>
-        <input
-          type="text"
-          value={title}
-          name="Title"
-          onChange={(event) => setTitle(event.target.value)}
-          data-testid="title"
-        />
-        <label>Author</label>
-        <input
-          type="text"
-          value={author}
-          name="Author"
-          onChange={(event) => setAuthor(event.target.value)}
-          data-testid="author"
-        />
-        <label>URL</label>
-        <input
-          type="text"
-          value={url}
-          name="Url"
-          onChange={(event) => setUrl(event.target.value)}
-          data-testid="url"
-        />
-        <button type="submit">Submit</button>
+        <div>
+          <TextField
+            margin="normal"
+            label="Title"
+            data-testid="title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+        </div>
+        <div>
+          <TextField
+            margin="normal"
+            label="Author"
+            data-testid="author"
+            value={author}
+            onChange={(event) => setAuthor(event.target.value)}
+          />
+        </div>
+        <div>
+          <TextField
+            margin="normal"
+            label="URL"
+            data-testid="url"
+            value={url}
+            onChange={(event) => setUrl(event.target.value)}
+          />
+        </div>
+        <Button type="submit">Submit</Button>
       </form>
-    </div>
+    </Box>
   )
 }
 
