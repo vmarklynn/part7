@@ -1,3 +1,4 @@
+import { Box, Button, TextareaAutosize } from '@mui/material'
 import { useState } from 'react'
 
 const CommentForm = ({ commentHandler }) => {
@@ -10,15 +11,17 @@ const CommentForm = ({ commentHandler }) => {
   }
 
   return (
-    <div>
+    <Box>
       <form onSubmit={handleSubmit}>
-        <textarea
+        <TextareaAutosize
           value={comment}
           onChange={(event) => setComment(event.target.value)}
         />
-        <button type="submit">Submit</button>
+        <Box>
+          <Button type="submit">Submit</Button>
+        </Box>
       </form>
-    </div>
+    </Box>
   )
 }
 

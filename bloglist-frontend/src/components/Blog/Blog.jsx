@@ -5,6 +5,7 @@ import { handleAlert } from '../../reducers/alertReducer'
 import { useState, useEffect } from 'react'
 import CommentForm from '../CommentForm/CommentForm'
 import blogService from '../../services/blogs'
+import { List, ListItem } from '@mui/material'
 
 const Blog = ({ blog, user }) => {
   const dispatch = useDispatch()
@@ -81,7 +82,10 @@ const Blog = ({ blog, user }) => {
       <div>
         <h2>Comments</h2>
         <CommentForm commentHandler={handleCommentPost} />
-        {comments && comments.map((comment) => <p>{comment}</p>)}
+        <List>
+          {comments &&
+            comments.map((comment) => <ListItem>{comment}</ListItem>)}
+        </List>
       </div>
     </div>
   )
