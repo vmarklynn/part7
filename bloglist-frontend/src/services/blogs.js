@@ -33,7 +33,7 @@ const deleteBlog = async (id) => {
   const config = {
     headers: { Authorization: token }
   }
-  const response = await axios.delete(`${baseUrl}/blogs${id}`, config)
+  const response = await axios.delete(`${baseUrl}/${id}`, config)
   return response.data
 }
 
@@ -44,9 +44,7 @@ const getComments = async (id) => {
 }
 
 const postComments = async (id, comment) => {
-  console.log(comment, id)
   const response = await axios.post(`${baseUrl}/${id}/comments`, comment)
-  console.log(`${baseUrl}/${id}/comments`)
   return response.data
 }
 

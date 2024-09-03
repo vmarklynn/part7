@@ -11,8 +11,6 @@ blogsRouter.post("/", userExtractor, async (request, response) => {
   const body = request.body;
   const user = request.user;
 
-  console.log(user);
-
   const blog = new Blog({
     title: body.title,
     author: body.author,
@@ -61,7 +59,6 @@ blogsRouter.put("/:id", async (request, response) => {
 blogsRouter.get("/:id/comments", async (request, response) => {
   const currentBlog = await Blog.findById(request.params.id);
   const comments = currentBlog.comments;
-  console.log(comments);
 
   response.json(comments);
 });
@@ -69,12 +66,18 @@ blogsRouter.get("/:id/comments", async (request, response) => {
 blogsRouter.post("/:id/comments", async (request, response) => {
   const body = request.body;
 
+  const newComment = {
+    comment: body.comment,
+  };
+
   const currentBlog = await Blog.findById(request.params.id);
-  currentBlog.comments = currentBlog.comments.concat(body.comment);
+  currentBlog.comments = currentBlog.comments.concat(newComment);
 
   await currentBlog.save();
 
-  response.status(201).json(currentBlog.comments);
+  response
+    .status(201)
+    .json(currentBlog.comments[currentBlog.comments.length - 1]);
 });
 
 module.exports = blogsRouter;
