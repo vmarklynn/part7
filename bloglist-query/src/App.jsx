@@ -1,4 +1,5 @@
 import { handleAlert } from './reducers/alertReducer'
+import { getUserValue, handleUser } from './reducers/userReducer'
 import {
   Container,
   AppBar,
@@ -33,12 +34,11 @@ import BlogForm from './components/BlogForm/BlogForm'
 import Login from './components/Login/Login'
 import Togglable from './components/Togglable/Togglable'
 import Alert from './components/Alert/Alert'
-import { setUser } from './reducers/userReducer'
 import User from './components/Users/User'
 
 const Header = ({ user }) => {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const userData = handleUser()
 
   const linkStyle = {
     padding: 5,
@@ -47,7 +47,7 @@ const Header = ({ user }) => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogUser')
-    dispatch(setUser(null))
+    userData(null)
     navigate('/login')
   }
 
@@ -154,18 +154,18 @@ const Blogs = ({ blogs }) => {
 }
 
 const LoginPage = () => {
-  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const alert = handleAlert()
+  const userData = handleUser()
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
-      dispatch(setUser(user))
+      userData(user)
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
@@ -190,7 +190,7 @@ const LoginPage = () => {
 }
 const App = () => {
   const dispatch = useDispatch()
-  const user = useSelector((state) => state.user)
+  const user = getUserValue()
   const blogs = useSelector((state) => state.blog)
   const [users, setUsers] = useState(null)
 
