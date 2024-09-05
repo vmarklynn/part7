@@ -29,6 +29,18 @@ const Blog = ({ blog, user }) => {
     }
   })
 
+  const updateMutation = useMutation({
+    mutationFn: blogService.updateBlog,
+    onSuccess: (updatedBlog) => {
+      console.log('Updated Blog: ', updatedBlog)
+      const blogs = queryClient.getQueryData(['blogs'])
+      const newBlogs = blogs.map((blog) =>
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      )
+      queryClient.setQueryData(['blogs'], newBlogs)
+    }
+  })
+
   useEffect(() => {
     if (blog) {
       blogService.getComments(blog.id).then((comments) => {
@@ -41,8 +53,7 @@ const Blog = ({ blog, user }) => {
     try {
       const newLike = blog.likes + 1
       const updatedBlog = { ...blog, likes: newLike }
-      console.log('Updated blog: ', updatedBlog)
-      dispatch(updateBlog(updatedBlog))
+      updateMutation.mutate(updatedBlog)
     } catch (e) {
       dispatch(handleAlert('Failed to update', true))
     }

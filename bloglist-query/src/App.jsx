@@ -207,7 +207,7 @@ const App = () => {
 
   const blogs = blogsQuery.data
 
-  console.log(blogs)
+  console.log('Current blogs: ', blogs)
 
   const match = useMatch('/users/:id')
   const blogMatch = useMatch('/blogs/:id')
