@@ -6,11 +6,28 @@ import { useState, useEffect } from 'react'
 import CommentForm from '../CommentForm/CommentForm'
 import blogService from '../../services/blogs'
 import { Box, List, ListItem } from '@mui/material'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const Blog = ({ blog, user }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [comments, setComments] = useState(null)
+
+  const queryClient = useQueryClient()
+
+  const deleteMutation = useMutation({
+    mutationFn: (blogId) => blogService.deleteBlog(blogId),
+    onSuccess: (blogId) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.filter((blog) => {
+          console.log(blog)
+          blog.id !== blogId
+        })
+      )
+    }
+  })
 
   useEffect(() => {
     if (blog) {
@@ -36,7 +53,7 @@ const Blog = ({ blog, user }) => {
       if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
         console.log(blog.id)
         const id = blog.id
-        dispatch(deleteBlog(id))
+        deleteMutation.mutate(id)
         navigate('/blogs')
       }
     } catch (e) {

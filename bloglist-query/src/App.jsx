@@ -1,5 +1,6 @@
 import { handleAlert } from './reducers/alertReducer'
 import { getUserValue, handleUser } from './reducers/userReducer'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Container,
   AppBar,
@@ -84,7 +85,7 @@ const Blogs = ({ blogs }) => {
   const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE)
   const alert = handleAlert()
 
-  const dispatch = useDispatch()
+  const queryClient = useQueryClient()
   const blogFormRef = useRef()
 
   const handleChangePage = (event, newPage) => {
@@ -96,11 +97,18 @@ const Blogs = ({ blogs }) => {
     setPage(0)
   }
 
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.createBlog,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    }
+  })
+
   const create = (blogObject) => {
     try {
       blogFormRef.current.toggleVisibility()
-      dispatch(createBlog(blogObject))
-
+      newBlogMutation.mutate(blogObject)
       alert({
         alert: `A new blog ${blogObject.title} by ${blogObject.author} was added.`,
         error: false
@@ -189,10 +197,17 @@ const LoginPage = () => {
   )
 }
 const App = () => {
-  const dispatch = useDispatch()
   const user = getUserValue()
-  const blogs = useSelector((state) => state.blog)
   const [users, setUsers] = useState(null)
+
+  const blogsQuery = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll
+  })
+
+  const blogs = blogsQuery.data
+
+  console.log(blogs)
 
   const match = useMatch('/users/:id')
   const blogMatch = useMatch('/blogs/:id')
@@ -205,10 +220,6 @@ const App = () => {
       })
       .catch((error) => console.log(error))
   }, [blogs])
-
-  useEffect(() => {
-    dispatch(initializeBlogs())
-  }, [dispatch])
 
   if (!blogs) return null
   if (!users) return null
