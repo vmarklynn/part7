@@ -1,6 +1,4 @@
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { updateBlog, deleteBlog } from '../../reducers/blogReducer'
 import { handleAlert } from '../../reducers/alertReducer'
 import { useState, useEffect } from 'react'
 import CommentForm from '../CommentForm/CommentForm'
@@ -9,7 +7,7 @@ import { Box, List, ListItem } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const Blog = ({ blog, user }) => {
-  const dispatch = useDispatch()
+  const alert = handleAlert()
   const navigate = useNavigate()
   const [comments, setComments] = useState(null)
 
@@ -22,22 +20,26 @@ const Blog = ({ blog, user }) => {
       queryClient.setQueryData(
         ['blogs'],
         blogs.filter((blog) => {
-          console.log(blog)
           blog.id !== blogId
         })
       )
+    },
+    onError: () => {
+      alert({ alert: 'Failed to delete', error: true })
     }
   })
 
   const updateMutation = useMutation({
     mutationFn: blogService.updateBlog,
     onSuccess: (updatedBlog) => {
-      console.log('Updated Blog: ', updatedBlog)
       const blogs = queryClient.getQueryData(['blogs'])
       const newBlogs = blogs.map((blog) =>
         blog.id === updatedBlog.id ? updatedBlog : blog
       )
       queryClient.setQueryData(['blogs'], newBlogs)
+    },
+    onError: () => {
+      alert({ alert: 'Failed to update', error: true })
     }
   })
 
@@ -50,25 +52,16 @@ const Blog = ({ blog, user }) => {
   }, [blog])
 
   const handleLike = () => {
-    try {
-      const newLike = blog.likes + 1
-      const updatedBlog = { ...blog, likes: newLike }
-      updateMutation.mutate(updatedBlog)
-    } catch (e) {
-      dispatch(handleAlert('Failed to update', true))
-    }
+    const newLike = blog.likes + 1
+    const updatedBlog = { ...blog, likes: newLike }
+    updateMutation.mutate(updatedBlog)
   }
 
   const handleDelete = () => {
-    try {
-      if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
-        console.log(blog.id)
-        const id = blog.id
-        deleteMutation.mutate(id)
-        navigate('/blogs')
-      }
-    } catch (e) {
-      dispatch(handleAlert('Failed to delete', true))
+    if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
+      const id = blog.id
+      deleteMutation.mutate(id)
+      navigate('/blogs')
     }
   }
 
@@ -76,8 +69,6 @@ const Blog = ({ blog, user }) => {
     const newComment = await blogService.postComments(blog.id, {
       comment
     })
-
-    console.log(newComment)
     setComments(comments.concat(newComment))
   }
 

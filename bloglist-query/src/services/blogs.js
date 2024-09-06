@@ -39,7 +39,6 @@ const deleteBlog = async (id) => {
 
 const getComments = async (id) => {
   const response = await axios.get(`${baseUrl}/${id}/comments`)
-  console.log(response.data)
   return response.data
 }
 

@@ -3,9 +3,6 @@ import { getUserValue, handleUser } from './reducers/userReducer'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Container,
-  AppBar,
-  Toolbar,
-  Button,
   Table,
   TableContainer,
   TableHead,
@@ -19,8 +16,6 @@ import loginService from './services/login'
 import userService from './services/users'
 import blogService from './services/blogs'
 import { useState, useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { initializeBlogs, createBlog } from './reducers/blogReducer'
 import Users from './components/Users/Users'
 import {
   Routes,
@@ -36,47 +31,7 @@ import Login from './components/Login/Login'
 import Togglable from './components/Togglable/Togglable'
 import Alert from './components/Alert/Alert'
 import User from './components/Users/User'
-
-const Header = ({ user }) => {
-  const navigate = useNavigate()
-  const userData = handleUser()
-
-  const linkStyle = {
-    padding: 5,
-    margin: 0
-  }
-
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogUser')
-    userData(null)
-    navigate('/login')
-  }
-
-  return (
-    user && (
-      <div>
-        <AppBar position="static">
-          <Toolbar>
-            <Button color="inherit" component={Link} to="/blogs">
-              Blogs
-            </Button>
-            <Button color="inherit" component={Link} to="/users">
-              Users
-            </Button>
-            <p style={linkStyle}>
-              {user.name} is currently logged in
-              {user && (
-                <Button color="inherit" onClick={handleLogout}>
-                  Log out
-                </Button>
-              )}
-            </p>
-          </Toolbar>
-        </AppBar>
-      </div>
-    )
-  )
-}
+import Header from './components/Header/Header'
 
 const Blogs = ({ blogs }) => {
   const ROWS_PER_PAGE = 10
@@ -102,23 +57,19 @@ const Blogs = ({ blogs }) => {
     onSuccess: (newBlog) => {
       const blogs = queryClient.getQueryData(['blogs'])
       queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+      alert({
+        alert: `A new blog ${newBlog.title} by ${newBlog.author} was added.`,
+        error: false
+      })
+    },
+    onError: () => {
+      alert({ alert: 'Blog failed to post', error: true })
     }
   })
 
   const create = (blogObject) => {
-    try {
-      blogFormRef.current.toggleVisibility()
-      newBlogMutation.mutate(blogObject)
-      alert({
-        alert: `A new blog ${blogObject.title} by ${blogObject.author} was added.`,
-        error: false
-      })
-    } catch (e) {
-      alert({
-        alert: 'Failed to post blog',
-        error: true
-      })
-    }
+    blogFormRef.current.toggleVisibility()
+    newBlogMutation.mutate(blogObject)
   }
 
   if (!blogs) return null
@@ -196,6 +147,7 @@ const LoginPage = () => {
     />
   )
 }
+
 const App = () => {
   const user = getUserValue()
   const [users, setUsers] = useState(null)
@@ -206,8 +158,6 @@ const App = () => {
   })
 
   const blogs = blogsQuery.data
-
-  console.log('Current blogs: ', blogs)
 
   const match = useMatch('/users/:id')
   const blogMatch = useMatch('/blogs/:id')

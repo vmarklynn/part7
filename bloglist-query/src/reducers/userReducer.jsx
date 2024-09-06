@@ -45,17 +45,3 @@ export const handleUser = () => {
     userDispatch({ type: 'SET_USER', payload })
   }
 }
-
-/* const userSlice = createSlice({
-  name: 'user',
-  initialState: getExistingUser(),
-  reducers: {
-    setUser(state, action) {
-      return action.payload
-    }
-  }
-})
-
-export const { setUser } = userSlice.actions
-
-export default userSlice.reducer */
