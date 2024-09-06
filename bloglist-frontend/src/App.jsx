@@ -1,8 +1,5 @@
 import {
   Container,
-  AppBar,
-  Toolbar,
-  Button,
   Table,
   TableContainer,
   TableHead,
@@ -10,8 +7,7 @@ import {
   TableCell,
   TablePagination,
   TableBody,
-  Paper,
-  Typography
+  Paper
 } from '@mui/material'
 import loginService from './services/login'
 import userService from './services/users'
@@ -36,47 +32,7 @@ import Togglable from './components/Togglable/Togglable'
 import Alert from './components/Alert/Alert'
 import { setUser } from './reducers/userReducer'
 import User from './components/Users/User'
-
-const Header = ({ user }) => {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-
-  const linkStyle = {
-    padding: 5,
-    margin: 0
-  }
-
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogUser')
-    dispatch(setUser(null))
-    navigate('/login')
-  }
-
-  return (
-    user && (
-      <div>
-        <AppBar position="static">
-          <Toolbar>
-            <Button color="inherit" component={Link} to="/blogs">
-              Blogs
-            </Button>
-            <Button color="inherit" component={Link} to="/users">
-              Users
-            </Button>
-            <p style={linkStyle}>
-              {user.name} is currently logged in
-              {user && (
-                <Button color="inherit" onClick={handleLogout}>
-                  Log out
-                </Button>
-              )}
-            </p>
-          </Toolbar>
-        </AppBar>
-      </div>
-    )
-  )
-}
+import Header from './components/Header/Header'
 
 const Blogs = ({ blogs }) => {
   const ROWS_PER_PAGE = 10
