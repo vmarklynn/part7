@@ -14,15 +14,16 @@ const Blog = ({ blog, user }) => {
   const queryClient = useQueryClient()
 
   const deleteMutation = useMutation({
-    mutationFn: (blogId) => blogService.deleteBlog(blogId),
-    onSuccess: (blogId) => {
+    mutationFn: blogService.deleteBlog,
+    onSuccess: (data, variables) => {
+      console.log(variables)
       const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(
-        ['blogs'],
-        blogs.filter((blog) => {
-          blog.id !== blogId
-        })
-      )
+      console.log(blogs)
+      const newBlogs = blogs.filter((blog) => {
+        return blog.id !== variables
+      })
+      console.log(newBlogs)
+      queryClient.setQueryData(['blogs'], newBlogs)
     },
     onError: () => {
       alert({ alert: 'Failed to delete', error: true })
