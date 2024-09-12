@@ -16,13 +16,10 @@ const Blog = ({ blog, user }) => {
   const deleteMutation = useMutation({
     mutationFn: blogService.deleteBlog,
     onSuccess: (data, variables) => {
-      console.log(variables)
       const blogs = queryClient.getQueryData(['blogs'])
-      console.log(blogs)
       const newBlogs = blogs.filter((blog) => {
         return blog.id !== variables
       })
-      console.log(newBlogs)
       queryClient.setQueryData(['blogs'], newBlogs)
     },
     onError: () => {
