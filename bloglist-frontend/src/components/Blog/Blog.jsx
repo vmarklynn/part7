@@ -24,7 +24,6 @@ const Blog = ({ blog, user }) => {
     try {
       const newLike = blog.likes + 1
       const updatedBlog = { ...blog, likes: newLike }
-      console.log('Updated blog: ', updatedBlog)
       dispatch(updateBlog(updatedBlog))
     } catch (e) {
       dispatch(handleAlert('Failed to update', true))
@@ -34,7 +33,6 @@ const Blog = ({ blog, user }) => {
   const handleDelete = () => {
     try {
       if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
-        console.log(blog.id)
         const id = blog.id
         dispatch(deleteBlog(id))
         navigate('/blogs')
@@ -49,7 +47,6 @@ const Blog = ({ blog, user }) => {
       comment
     })
 
-    console.log(newComment)
     setComments(comments.concat(newComment))
   }
 

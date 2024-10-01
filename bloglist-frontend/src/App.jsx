@@ -34,8 +34,7 @@ const App = () => {
     dispatch(initializeBlogs())
   }, [dispatch])
 
-  if (!blogs) return null
-  if (!users) return null
+  if (!blogs || !users) return null
 
   const matchedUser = match
     ? users.find((user) => user.id === match.params.id)
